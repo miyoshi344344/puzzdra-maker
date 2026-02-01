@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Puzzle Board Maker</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- 中央：盤面 -->
+    <div class="stage">
+      <div class="board-wrap">
+        <div id="board" class="board" aria-label="puzzle board"></div>
+        <div class="kpi" id="stats"></div>
+      </div>
+    </div>
+
+    <!-- 右：操作（指定順） -->
+    <aside class="panel">
+      <h2>設定</h2>
+
+      <!-- 盤面のサイズ -->
+      <div class="section">
+        <div class="muted">盤面のサイズ</div>
+        <div class="row mt6">
+          <button id="btn76">7×6</button>
+          <button id="btn56" class="primary">5×6</button>
+          <button id="btn54">5×4</button>
+        </div>
+      </div>
+
+      <!-- ランダム生成 / クリア -->
+      <div class="section">
+        <div class="row">
+          <button id="modeRandom" aria-pressed="true" class="primary">ランダム生成</button>
+          <button id="clear">クリア</button>
+        </div>
+      </div>
+
+      <!-- 元に戻す / 再生 / 動作クリア -->
+      <div class="section">
+        <div class="row">
+          <button id="undo">元に戻す</button>
+          <button id="play">再生</button>
+          <button id="clearPath">動作クリア</button>
+        </div>
+        <div class="muted mt6" id="pathInfo"></div>
+      </div>
+
+      <!-- ランダム生成で使う色 -->
+      <div class="section">
+        <div class="muted">ランダム生成で使う色</div>
+        <div id="colorChecks" class="row mt6"></div>
+      </div>
+
+      <!-- 自由配置 -->
+      <div class="section">
+        <div class="row">
+          <button id="modeFree" aria-pressed="false">自由配置</button>
+        </div>
+      </div>
+
+      <!-- 自由配置に使う色 -->
+      <div class="section">
+        <div class="muted">自由配置に使う色</div>
+        <div id="pen" class="row mt6"></div>
+        <div class="muted mt6">※「消す」を選んでタップすると1マス消せる</div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

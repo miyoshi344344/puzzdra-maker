@@ -1,0 +1,364 @@
+:root {
+    --cell: 50px;
+    --gap: 8px;
+    --panel-w: 300px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: #0f1115;
+    color: #eaeef6;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app {
+    width: min(1100px, 96vw);
+    height: min(860px, 92vh);
+    /* PCで収める */
+    display: grid;
+    grid-template-columns: 1fr var(--panel-w);
+    gap: 16px;
+    align-items: stretch;
+}
+
+/* 中央に盤面 */
+.stage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 14px 10px;
+    background: rgba(255, 255, 255, .03);
+    border: 1px solid rgba(255, 255, 255, .06);
+    border-radius: 18px;
+    min-height: 0;
+    /* 重要：無駄な縦伸びでスクロールしない */
+}
+
+.board-wrap {
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .04);
+
+    /* 盤面の枠：強調 */
+    border: 2px solid rgba(255, 255, 255, .18);
+    box-shadow:
+        0 10px 28px rgba(0, 0, 0, .45),
+        inset 0 0 0 2px rgba(255, 255, 255, .05);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 盤面（タイル感） */
+.board {
+    display: grid;
+    gap: var(--gap);
+    width: fit-content;
+
+    touch-action: none;
+    user-select: none;
+
+    position: relative;
+
+    background: rgba(0, 0, 0, .22);
+    padding: 6px;
+    border-radius: 14px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+}
+
+/* グリッド線（隙間中心に合わせる：ズレ修正＋強調） */
+.board::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    /* padding分だけ内側に */
+    pointer-events: none;
+    border-radius: 12px;
+
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, .22) 0 2px, transparent 2px),
+        linear-gradient(to bottom, rgba(255, 255, 255, .22) 0 2px, transparent 2px);
+
+    background-size:
+        calc(var(--cell) + var(--gap)) 100%,
+        100% calc(var(--cell) + var(--gap));
+
+    background-position:
+        calc(var(--cell) + (var(--gap) / 2)) 0,
+        0 calc(var(--cell) + (var(--gap) / 2));
+
+    background-repeat: repeat;
+    opacity: .85;
+}
+
+.cell {
+    width: var(--cell);
+    height: var(--cell);
+    border-radius: 50%;
+    background: #2a2f3a;
+    box-shadow:
+        inset 0 0 0 2px rgba(255, 255, 255, .10),
+        0 6px 16px rgba(0, 0, 0, .28);
+    cursor: pointer;
+    user-select: none;
+    touch-action: none;
+}
+
+.cell:active {
+    transform: translateY(1px);
+}
+
+/* 選択中 */
+.cell.selected {
+    outline: 3px solid rgba(255, 255, 255, .85);
+    outline-offset: 2px;
+}
+
+/* 再生中 */
+.board.replaying {
+    opacity: .75;
+    pointer-events: none;
+}
+
+/* ドロップ色 */
+.fire {
+    background: radial-gradient(circle at 30% 30%, #ffd1c1, #ff4b2b 65%, #b11200);
+}
+
+.water {
+    background: radial-gradient(circle at 30% 30%, #d7f1ff, #2a7fff 65%, #083a86);
+}
+
+.wood {
+    background: radial-gradient(circle at 30% 30%, #ddffd8, #3ac55b 65%, #0f6a23);
+}
+
+.dark {
+    background: radial-gradient(circle at 30% 30%, #f0d7ff, #7c3aed 65%, #2a0b53);
+}
+
+.light {
+    background: radial-gradient(circle at 30% 30%, #fff6c7, #f6c92b 65%, #9a6a00);
+}
+
+.heal {
+    background: radial-gradient(circle at 30% 30%, #ffe0f1, #ff5fa2 65%, #8c1c4a);
+}
+
+.empty {
+    background: #2a2f3a;
+}
+
+/* 回復だけ四角 */
+.cell.heal {
+    border-radius: 14px;
+}
+
+/* 右パネル */
+.panel {
+    position: sticky;
+    top: 10px;
+    padding: 12px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .03);
+    border: 1px solid rgba(255, 255, 255, .06);
+}
+
+.panel h2 {
+    margin: 2px 0 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.section {
+    padding: 8px 0 10px;
+    border-top: 1px solid rgba(255, 255, 255, .06);
+}
+
+.section:first-of-type {
+    border-top: 0;
+    padding-top: 0;
+}
+
+.row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+button {
+    border: 1px solid rgba(255, 255, 255, .12);
+    background: rgba(255, 255, 255, .06);
+    color: #eaeef6;
+    padding: 9px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 650;
+    font-size: 14px;
+    transition: .15s ease;
+}
+
+button:hover {
+    background: rgba(255, 255, 255, .10);
+}
+
+button.primary {
+    background: rgba(255, 255, 255, .16);
+    border-color: rgba(255, 255, 255, .22);
+}
+
+.chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, .10);
+    background: rgba(255, 255, 255, .04);
+    cursor: pointer;
+    user-select: none;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .15);
+}
+
+.muted {
+    color: rgba(234, 238, 246, .75);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.kpi {
+    font-size: 13px;
+    text-align: center;
+    max-width: 100%;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.5;
+}
+
+.mt6 {
+    margin-top: 6px;
+}
+
+@media (max-width: 920px) {
+    .app {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .panel {
+        position: relative;
+        top: auto;
+    }
+
+    :root {
+        --cell: 46px;
+        --gap: 7px;
+        --panel-w: 1fr;
+    }
+}
+
+/* ====== Mobile (375px) tuning ====== */
+@media (max-width: 420px) {
+    :root {
+        /* 375pxで盤面がきれいに収まるサイズ */
+        --cell: 44px;
+        --gap: 6px;
+        --panel-w: 1fr;
+    }
+
+    body {
+        align-items: flex-start;
+        /* 上から並べる */
+    }
+
+    .app {
+        grid-template-columns: 1fr;
+        width: 100vw;
+        height: auto;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .stage {
+        padding: 12px 8px;
+        border-radius: 16px;
+    }
+
+    .board-wrap {
+        padding: 12px;
+        border-radius: 16px;
+    }
+
+    .board {
+        padding: 6px;
+        border-radius: 14px;
+    }
+
+    /* グリッド線の見え方調整（スマホは少し細めに） */
+    .board::before {
+        opacity: .75;
+        background-image:
+            linear-gradient(to right, rgba(255, 255, 255, .20) 0 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, .20) 0 1px, transparent 1px);
+    }
+
+    .kpi {
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .panel {
+        position: relative;
+        /* sticky解除 */
+        top: auto;
+        padding: 12px;
+        border-radius: 16px;
+    }
+
+    /* ボタンを押しやすく */
+    button {
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 14px;
+    }
+
+    /* チップ（ランダム色チェック）は2列感に */
+    .chip {
+        padding: 7px 10px;
+    }
+
+    /* “色ボタン”を2〜3列で整列させて見た目を揃える */
+    #pen button {
+        flex: 1 1 calc(33.333% - 8px);
+        /* 3列 */
+    }
+
+    #colorChecks label.chip {
+        flex: 1 1 calc(50% - 8px);
+        /* 2列 */
+    }
+}
+
+@media (max-width: 420px){
+    .stage{
+      overflow-x: auto; /* 万が一はみ出しても横スクロールで破綻しない */
+    }
+  }
+  
